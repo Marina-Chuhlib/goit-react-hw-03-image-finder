@@ -6,16 +6,16 @@ const instance = axios.create({
   params: {
     per_page: 12,
     key: '31925489-f049a5b460fb8a2a8423fe357',
-    page: 1,
     image_type: 'photo',
     orientation: 'orientation',
   },
 });
 
-export const searchImages = async q => {
+export const searchImages = async (q, page = 1) => {
   const { data } = await instance.get('/?&', {
     params: {
       q,
+      page,
     },
   });
   return data.hits;

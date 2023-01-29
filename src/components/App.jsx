@@ -2,6 +2,8 @@ import { Component } from 'react';
 
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
+import Loader from './Loader/Loader';
+import Modal from './Modal/Modal';
 
 import { searchImages } from './services/api';
 
@@ -14,54 +16,63 @@ class App extends Component {
     loading: false,
     error: null,
     page: 1,
-    showModal: false,
-    postDetails: null,
+    currentImage: null,
   };
 
   componentDidUpdate(prevProp, prevState) {
-    const { search } = this.state;
-    if (prevState.search !== search) {
+    const { search, page } = this.state;
+    if (prevState.search !== search || prevState.page !== page) {
+      this.fetchPictures();
+    }
+  }
+
+  async fetchPictures() {
+    try {
       this.setState({ loading: true });
-      searchImages(search)
-        .then(hits => this.setState({ pictures: hits }))
-        .catch(error => this.setState({ error: error.massage }))
-        .finally(() => this.setState({ loading: false }));
+      const { search, page } = this.state;
+
+      const hits = await searchImages(search, page);
+
+      this.setState(({ pictures }) => ({
+        pictures: [...pictures, ...hits],
+      }));
+    } catch (error) {
+      this.setState({ error: error.message });
+    } finally {
+      this.setState({ loading: false });
     }
   }
 
   searchPictures = ({ search }) => {
-    this.setState({ search });
+    this.setState({ search, pictures: [], page: 1 });
   };
 
-  //   async searchImages() {
-  //     try {
-  //         this.setState({loading: true});
-  //       const { search, page } = this.state;
+  showPicture = ({ hits}) => {
+      this.setState({
+      currentImage: hits,
+    })
+  };
 
-  //       const data = await searchImages(search, page);
-
-  //         this.setState(({pictures}) => ({
-  //             pictures: [...pictures, ...data]
-  //         }))
-  //     }
-  //     catch(error) {
-  //         this.setState({error: error.message})
-  //     }
-  //     finally {
-  //         this.setState({loading: false})
-  //     }
-  // }
+  loadMore = () => {
+    this.setState(({ page }) => ({ page: page + 1 }));
+  };
 
   render() {
-    const { loading, error, pictures } = this.state;
-    const { searchPictures } = this;
+    const { loading, error, pictures, currentImage } = this.state;
+    const { searchPictures, loadMore, showPicture } = this;
 
     return (
       <div className={css.App}>
         <Searchbar onSubmit={searchPictures} />
         {error && <p className={css.errorMassage}>{error}</p>}
-        {loading && <p>Loading...</p>}
-        <ImageGallery pictures={pictures} />
+        {loading && <Loader />}
+        <ImageGallery pictures={pictures} showPicture={showPicture}/>
+        {Boolean(pictures.length) && (
+          <button onClick={loadMore} className={css.btnLoadMore} type="button">
+            Load more
+          </button>
+        )}
+        {currentImage && <Modal currentImage={currentImage} />}
       </div>
     );
   }
