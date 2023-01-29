@@ -1,20 +1,34 @@
 import { Component } from 'react';
 import { createPortal } from 'react-dom';
-
-// import * as basicLightbox from 'basiclightbox';
+import PropTypes from 'prop-types';
 
 import css from './Modal.module.css';
 
 const modalRoot = document.querySelector('#modal-root');
 
 class Modal extends Component {
+  componentDidMount() {
+    window.addEventListener('keydown', this.closeModal);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('keydown', this.closeModal);
+  }
+
+  closeModal = ({ target, currentTarget, code }) => {
+    if (target === currentTarget || code === 'Escape') {
+      this.props.closeModal();
+    }
+  };
+
   render() {
+    const { closeModal } = this;
     const {
       currentImage: { alt, src },
     } = this.props;
 
     return createPortal(
-      <div className={css.overlay}>
+      <div className={css.overlay} onClick={closeModal}>
         <div className={css.modal}>
           <img src={src} alt={alt} />
         </div>
@@ -26,21 +40,6 @@ class Modal extends Component {
 
 export default Modal;
 
-// class Modal extends Component {
-
-//   render() {
-//     const instance = basicLightbox.create(`
-//     <div class="modal">
-//         <p>
-//          <img src="" alt="" />
-//             Your first lightbox with just a few lines of code.
-//             Yes, it's really that simple.
-//         </p>
-//     </div>
-// `);
-
-//     return <div className={css.overlay}>{instance}</div>;
-//   }
-// }
-
-// instance.show()
+Modal.propTypes = {
+  closeModal: PropTypes.func.isRequired,
+};

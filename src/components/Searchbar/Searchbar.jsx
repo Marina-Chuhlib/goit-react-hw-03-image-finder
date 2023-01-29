@@ -34,7 +34,7 @@ class Searchbar extends Component {
     return (
       <header className={css.Searchbar}>
         <form className={css.SearchForm} onSubmit={handleSubmit}>
-          <button type="submit" className={css.button}>x
+          <button type="submit" className={css.button}>
             <span className={css.label}>Search</span>
           </button>
 
@@ -56,3 +56,4 @@ class Searchbar extends Component {
 }
 
 export default Searchbar;
+

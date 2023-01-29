@@ -1,8 +1,12 @@
 import { Component } from 'react';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Loader from './Loader/Loader';
+import Button from './Button/Button';
 import Modal from './Modal/Modal';
 
 import { searchImages } from './services/api';
@@ -33,6 +37,10 @@ class App extends Component {
 
       const hits = await searchImages(search, page);
 
+      if (hits.length === 0) {
+        toast.error('Sorry, there are no available images. Please try again.');
+      }
+
       this.setState(({ pictures }) => ({
         pictures: [...pictures, ...hits],
       }));
@@ -47,10 +55,14 @@ class App extends Component {
     this.setState({ search, pictures: [], page: 1 });
   };
 
-  showPicture = ({ hits}) => {
-      this.setState({
-      currentImage: hits,
-    })
+  showPicture = img => {
+    this.setState({
+      currentImage: img,
+    });
+  };
+
+  closeModal = () => {
+    this.setState({ currentImage: null });
   };
 
   loadMore = () => {
@@ -58,21 +70,23 @@ class App extends Component {
   };
 
   render() {
-    const { loading, error, pictures, currentImage } = this.state;
-    const { searchPictures, loadMore, showPicture } = this;
+    const { loading, error, pictures, currentImage, search } = this.state;
+    const { searchPictures, loadMore, showPicture, closeModal } = this;
 
     return (
       <div className={css.App}>
         <Searchbar onSubmit={searchPictures} />
+        {!search && (
+          <p className={css.requestMassage}>Please enter a request</p>
+        )}
         {error && <p className={css.errorMassage}>{error}</p>}
         {loading && <Loader />}
-        <ImageGallery pictures={pictures} showPicture={showPicture}/>
-        {Boolean(pictures.length) && (
-          <button onClick={loadMore} className={css.btnLoadMore} type="button">
-            Load more
-          </button>
+        <ImageGallery pictures={pictures} showPicture={showPicture} />
+        {Boolean(pictures.length) && <Button loadMore={loadMore} />}
+        {currentImage && (
+          <Modal currentImage={currentImage} closeModal={closeModal} />
         )}
-        {currentImage && <Modal currentImage={currentImage} />}
+        <ToastContainer />
       </div>
     );
   }
