@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import { createPortal } from 'react-dom';
 
-import * as basicLightbox from 'basiclightbox';
+// import * as basicLightbox from 'basiclightbox';
 
 import css from './Modal.module.css';
 
