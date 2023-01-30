@@ -9,7 +9,7 @@ import Loader from './Loader/Loader';
 import Button from './Button/Button';
 import Modal from './Modal/Modal';
 
-import { searchImages } from './services/api';
+import { searchImages } from '../services/api';
 
 import css from './App.module.css';
 
@@ -81,7 +81,9 @@ class App extends Component {
         )}
         {error && <p className={css.errorMassage}>{error}</p>}
         {loading && <Loader />}
-        <ImageGallery pictures={pictures} showPicture={showPicture} />
+        {ImageGallery && (
+          <ImageGallery pictures={pictures} showPicture={showPicture} />
+        )}
         {Boolean(pictures.length) && <Button loadMore={loadMore} />}
         {currentImage && (
           <Modal currentImage={currentImage} closeModal={closeModal} />
