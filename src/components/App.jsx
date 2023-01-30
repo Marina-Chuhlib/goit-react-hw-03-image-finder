@@ -84,7 +84,7 @@ class App extends Component {
         {ImageGallery && (
           <ImageGallery pictures={pictures} showPicture={showPicture} />
         )}
-        {Boolean(pictures.length) && <Button loadMore={loadMore} />}
+        {Boolean(pictures.length) && !loading && <Button loadMore={loadMore} />}
         {currentImage && (
           <Modal currentImage={currentImage} closeModal={closeModal} />
         )}
